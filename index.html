@@ -1,286 +1,197 @@
-import React, { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ujian Personaliti Warna — 100 Soalan</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+</head>
+<body class="bg-gray-100">
+  <div id="root"></div>
 
-// Ujian Personaliti Warna — 100 Soalan
-// Single-file React component (Tailwind CSS expected in host project)
-// Soalan diambil daripada borang yang diberikan oleh pengguna.
+  <script type="text/javascript">
+    const { useState, useMemo } = React;
 
-const QUESTIONS = [
-  "Saya cepat menyelesaikan diri dengan situasi baru.",
-  "Saya lebih tua dari umur sebenar saya daripada segi pemikiran.",
-  "Saya mudah mesra bila berhubung dengan orang lain.",
-  "Saya adalah dalam golongan orang yang pandai.",
-  "Saya amat selesa dengan pengekalan cara hidup tradisi.",
-  "Saya bersemangat mengikuti subjek yang merangsang minda.",
-  "Saya suka kelihatan berbeza daripada orang lain.",
-  "Saya isikan masa lapang dengan aktiviti luar yang menyeronokkan.",
-  "Saya sangat menghargai kehidupan berkeluarga.",
-  "Saya sentiasa membaca untuk menambah ilmu pengetahuan.",
-  "Saya suka menunjukkan keperibadian saya sebenar dalam semua keadaan.",
-  "Saya suka bergaul dengan semua orang.",
-  "Saya akan melakukan segala kerja secara bersistematik.",
-  "Saya sering bertanya guru mengenai persoalan yang mengganggu minda saya.",
-  "Saya selalu memberi dorongan kepada orang lain untuk melakukan sesuatu pekerjaan.",
-  "Saya tidak gentar dengan sebarang cabaran.",
-  "Saya selesa menghormati pihak berkuasa.",
-  "Guru merupakan orang yang sangat saya hormati.",
-  "Saya senang berinteraksi dengan orang lain.",
-  "Saya seorang yang suka aktiviti perkhemahan.",
-  "Saya mempunyai emosi yang stabil.",
-  "Saya berminat untuk meneroka semua bidang.",
-  "Saya cenderung memilih pekerjaan dalam bidang pendidikan.",
-  "Persaingan adalah baik bagi saya.",
-  "Saya sentiasa patuh kepada peraturan walau di mana saya berada.",
-  "Saya seorang yang sabar.",
-  "Saya amat sesuai melibatkan diri dalam aktiviti menolong orang lain.",
-  "Saya sukakan perkara yang berbentuk amali daripada teori.",
-  "Saya amat menghargai masa.",
-  "Saya suka menganalisis diri sendiri dan orang lain.",
-  "Saya lebih suka melibatkan diri dalam pekerjaan yang ada unsur-unsur kesenian.",
-  "Saya selalu menimbulkan suasana keceriaan ketika tegang.",
-  "Saya sanggup bekerja keras untuk kepentingan organisasi.",
-  "Saya akan berpuas hati setelah kerja disiapkan dengan sempurna.",
-  "Saya berkebolehan untuk menyelami perasaan orang.",
-  "Saya selalu memberikan gerakbalas yang spontan dalam setiap tindakan.",
-  "Saya selesa mematuhi peraturan-peraturan yang ditetapkan.",
-  "Saya suka membincangkan falsafah tentang sesuatu perkara.",
-  "Saya memiliki ciri-ciri seorang pengasuh.",
-  "Saya suka kepada sesuatu yang luar biasa dan mencabar.",
-  "Saya seorang yang suka berjimat cermat.",
-  "Saya sering meminta penjelasan tentang sesuatu persoalan.",
-  "Saya percaya setiap orang mempunyai harga diri.",
-  "Saya sukakan aktiviti yang berbahaya tetapi menyeronokkan.",
-  "Saya tidak suka berpakaian selekeh.",
-  "Saya suka kepada perkara yang memerlukan aktiviti penyelidikan.",
-  "Saya lebih bermotivasi sekiranya diberi dorongan.",
-  "Saya seorang yang kelakar.",
-  "Saya sering kali bersifat konkrit.",
-  "Saya gemar membahaskan sesuatu teori.",
-  "Saya tidak berminat dengan aktiviti yang melibatkan persaingan.",
-  "Saya tidak suka pelajaran yang memerlukan pembacaan yang banyak.",
-  "Saya seorang yang bertanggungjawab.",
-  "Saya mempunyai prinsip hidup yang jelas.",
-  "Saya mahu mendapat kepujian daripada orang lain di atas setiap kejayaan saya.",
-  "Saya suka aktiviti ko-kurikulum yang lasak.",
-  "Saya bersifat keibubapaan.",
-  "Saya cenderung untuk merekacipta sesuatu yang baru.",
-  "Keadaan perbalahan selalu mengganggu emosi saya.",
-  "Saya bosan dengan kerja berstruktur.",
-  "Saya seorang yang mementingkan keharmonian.",
-  "Saya berkebolehan menjalankan sesuatu tugas dengan sempurna.",
-  "Saya seorang pendengar yang baik.",
-  "Saya bosan dengan kerja-kerja yang rigid.",
-  "Saya seorang yang amanah.",
-  "Saya sentiasa bersifat ingin tahu yang tinggi terhadap sesuatu.",
-  "Adakah anda seorang yang mudah menyayangi orang lain.",
-  "Saya bosan dengan kerja yang rutin.",
-  "Saya sentiasa bersedia untuk melakukan sesuatu kerja.",
-  "Saya adalah seorang yang tenang.",
-  "Sekali sekala saya mudah terasa apabila orang lain bercakap mengenai diri saya.",
-  "Saya puas hati dengan kerja yang melibatkan kebebasan.",
-  "Saya selalunya dapat membezakan perkara yang baik dan buruk dalam kehidupan.",
-  "Saya berminat menyertai pertandingan yang mencabar minda.",
-  "Saya tidak gemar menonton cerita yang berunsur keganasan.",
-  "Saya puas hati dengan kerja yang dapat menggunakan koordinasi fizikal.",
-  "Saya berpuas hati kerana dapat menolong seseorang yang memerlukan pertolongan.",
-  "Bagi saya kerja itu adalah suatu permainan.",
-  "Saya mudah rasa bersalah apabila tidak mematuhi nasihat ibu bapa.",
-  "Saya puas hati dengan kerja yang menggunakan alatan.",
-  "Saya selalu memastikan kestabilan dalam suasana pekerjaan.",
-  "Saya seorang yang sangat menyukai tugas yang mencabar.",
-  "Saya mudah memaafkan kesalahan orang lain.",
-  "Saya seorang yang performer semula jadi.",
-  "Saya seorang yang teliti dalam membuat sesuatu pekerjaan.",
-  "Saya suka merekacipta sesuatu model.",
-  "Saya mudah simpati kepada seseorang walaupun ternyata dia bersalah.",
-  "Saya tidak suka dikongkong.",
-  "Saya sentiasa bersifat wajar dalam membuat sebarang keputusan.",
-  "Saya lebih suka meneroka idea-idea baru.",
-  "Saya suka meniru gaya orang lain.",
-  "Saya tidak suka kepada peraturan.",
-  "Saya berkebolehan untuk mengendalikan urusan yang memerlukan perincian.",
-  "Saya berminat untuk menyertai aktiviti-aktiviti berbentuk ilmiah.",
-  "Zaman persekolahan saya begitu membosankan kerana terpaksa mengikut peraturan.",
-  "Pekerjaan tanpa jadual sangat menarik minat saya.",
-  "Saya mahir menyusun atur tempat kerja.",
-  "Saya akan beralih ke projek yang baru setelah menyelesaikan tugas yang lama.",
-  "Saya suka berkhayal tentang masa hadapan.",
-  "Saya suka melakukan kerja tanpa tekanan."
-];
+    const QUESTIONS = [
+      "Saya cepat menyelesaikan diri dengan situasi baru.",
+      "Saya lebih tua dari umur sebenar saya daripada segi pemikiran.",
+      "Saya mudah mesra bila berhubung dengan orang lain.",
+      "Saya adalah dalam golongan orang yang pandai.",
+      "Saya amat selesa dengan pengekalan cara hidup tradisi.",
+      "Saya bersemangat mengikuti subjek yang merangsang minda.",
+      "Saya suka kelihatan berbeza daripada orang lain.",
+      "Saya isikan masa lapang dengan aktiviti luar yang menyeronokkan.",
+      "Saya sangat menghargai kehidupan berkeluarga.",
+      "Saya sentiasa membaca untuk menambah ilmu pengetahuan.",
+      "Saya suka menunjukkan keperibadian saya sebenar dalam semua keadaan.",
+      "Saya suka bergaul dengan semua orang.",
+      "Saya akan melakukan segala kerja secara bersistematik.",
+      "Saya sering bertanya guru mengenai persoalan yang mengganggu minda saya.",
+      "Saya selalu memberi dorongan kepada orang lain untuk melakukan sesuatu pekerjaan.",
+      "Saya tidak gentar dengan sebarang cabaran.",
+      "Saya selesa menghormati pihak berkuasa.",
+      "Guru merupakan orang yang sangat saya hormati.",
+      "Saya senang berinteraksi dengan orang lain.",
+      "Saya seorang yang suka aktiviti perkhemahan.",
+      "Saya mempunyai emosi yang stabil.",
+      "Saya berminat untuk meneroka semua bidang.",
+      "Saya cenderung memilih pekerjaan dalam bidang pendidikan.",
+      "Persaingan adalah baik bagi saya.",
+      "Saya sentiasa patuh kepada peraturan walau di mana saya berada.",
+      "Saya seorang yang sabar.",
+      "Saya amat sesuai melibatkan diri dalam aktiviti menolong orang lain.",
+      "Saya sukakan perkara yang berbentuk amali daripada teori.",
+      "Saya amat menghargai masa.",
+      "Saya suka menganalisis diri sendiri dan orang lain.",
+      "Saya lebih suka melibatkan diri dalam pekerjaan yang ada unsur-unsur kesenian.",
+      "Saya selalu menimbulkan suasana keceriaan ketika tegang.",
+      "Saya sanggup bekerja keras untuk kepentingan organisasi.",
+      "Saya akan berpuas hati setelah kerja disiapkan dengan sempurna.",
+      "Saya berkebolehan untuk menyelami perasaan orang.",
+      "Saya selalu memberikan gerakbalas yang spontan dalam setiap tindakan.",
+      "Saya selesa mematuhi peraturan-peraturan yang ditetapkan.",
+      "Saya suka membincangkan falsafah tentang sesuatu perkara.",
+      "Saya memiliki ciri-ciri seorang pengasuh.",
+      "Saya suka kepada sesuatu yang luar biasa dan mencabar.",
+      "Saya seorang yang suka berjimat cermat.",
+      "Saya sering meminta penjelasan tentang sesuatu persoalan.",
+      "Saya percaya setiap orang mempunyai harga diri.",
+      "Saya sukakan aktiviti yang berbahaya tetapi menyeronokkan.",
+      "Saya tidak suka berpakaian selekeh.",
+      "Saya suka kepada perkara yang memerlukan aktiviti penyelidikan.",
+      "Saya lebih bermotivasi sekiranya diberi dorongan.",
+      "Saya seorang yang kelakar.",
+      "Saya sering kali bersifat konkrit.",
+      "Saya gemar membahaskan sesuatu teori.",
+      "Saya tidak berminat dengan aktiviti yang melibatkan persaingan.",
+      "Saya tidak suka pelajaran yang memerlukan pembacaan yang banyak.",
+      "Saya seorang yang bertanggungjawab.",
+      "Saya mempunyai prinsip hidup yang jelas.",
+      "Saya mahu mendapat kepujian daripada orang lain di atas setiap kejayaan saya.",
+      "Saya suka aktiviti ko-kurikulum yang lasak.",
+      "Saya bersifat keibubapaan.",
+      "Saya cenderung untuk merekacipta sesuatu yang baru.",
+      "Keadaan perbalahan selalu mengganggu emosi saya.",
+      "Saya bosan dengan kerja berstruktur.",
+      "Saya seorang yang mementingkan keharmonian.",
+      "Saya berkebolehan menjalankan sesuatu tugas dengan sempurna.",
+      "Saya seorang pendengar yang baik.",
+      "Saya bosan dengan kerja-kerja yang rigid.",
+      "Saya seorang yang amanah.",
+      "Saya sentiasa bersifat ingin tahu yang tinggi terhadap sesuatu.",
+      "Adakah anda seorang yang mudah menyayangi orang lain.",
+      "Saya bosan dengan kerja yang rutin.",
+      "Saya sentiasa bersedia untuk melakukan sesuatu kerja.",
+      "Saya adalah seorang yang tenang.",
+      "Sekali sekala saya mudah terasa apabila orang lain bercakap mengenai diri saya.",
+      "Saya puas hati dengan kerja yang melibatkan kebebasan.",
+      "Saya selalunya dapat membezakan perkara yang baik dan buruk dalam kehidupan.",
+      "Saya berminat menyertai pertandingan yang mencabar minda.",
+      "Saya tidak gemar menonton cerita yang berunsur keganasan.",
+      "Saya puas hati dengan kerja yang dapat menggunakan koordinasi fizikal.",
+      "Saya berpuas hati kerana dapat menolong seseorang yang memerlukan pertolongan.",
+      "Bagi saya kerja itu adalah suatu permainan.",
+      "Saya mudah rasa bersalah apabila tidak mematuhi nasihat ibu bapa.",
+      "Saya puas hati dengan kerja yang menggunakan alatan.",
+      "Saya selalu memastikan kestabilan dalam suasana pekerjaan.",
+      "Saya seorang yang sangat menyukai tugas yang mencabar.",
+      "Saya mudah memaafkan kesalahan orang lain.",
+      "Saya seorang yang performer semula jadi.",
+      "Saya seorang yang teliti dalam membuat sesuatu pekerjaan.",
+      "Saya suka merekacipta sesuatu model.",
+      "Saya mudah simpati kepada seseorang walaupun ternyata dia bersalah.",
+      "Saya tidak suka dikongkong.",
+      "Saya sentiasa bersifat wajar dalam membuat sebarang keputusan.",
+      "Saya lebih suka meneroka idea-idea baru.",
+      "Saya suka meniru gaya orang lain.",
+      "Saya tidak suka kepada peraturan.",
+      "Saya berkebolehan untuk mengendalikan urusan yang memerlukan perincian.",
+      "Saya berminat untuk menyertai aktiviti-aktiviti berbentuk ilmiah.",
+      "Zaman persekolahan saya begitu membosankan kerana terpaksa mengikut peraturan.",
+      "Pekerjaan tanpa jadual sangat menarik minat saya.",
+      "Saya mahir menyusun atur tempat kerja.",
+      "Saya akan beralih ke projek yang baru setelah menyelesaikan tugas yang lama.",
+      "Saya suka berkhayal tentang masa hadapan.",
+      "Saya suka melakukan kerja tanpa tekanan."
+    ];
 
-// Mapping: question indices (1-based) -> color
-const COLOR_GROUPS = {
-  emas:    new Set([1,5,9,13,17,21,25,29,33,37,41,45,49,53,57,61,65,69,73,77,81,85,89,93,97]),
-  hijau:   new Set([2,6,10,14,18,22,26,30,34,38,42,46,50,54,58,62,66,70,74,78,82,86,90,94,98]),
-  biru:    new Set([3,7,11,15,19,23,27,31,35,39,43,47,51,55,59,63,67,71,75,79,83,87,91,95,99]),
-  jingga:  new Set([4,8,12,16,20,24,28,32,36,40,44,48,52,56,60,64,68,72,76,80,84,88,92,96,100])
-};
+    const COLOR_GROUPS = {
+      emas: new Set([1,5,9,13,17,21,25,29,33,37,41,45,49,53,57,61,65,69,73,77,81,85,89,93,97]),
+      hijau: new Set([2,6,10,14,18,22,26,30,34,38,42,46,50,54,58,62,66,70,74,78,82,86,90,94,98]),
+      biru: new Set([3,7,11,15,19,23,27,31,35,39,43,47,51,55,59,63,67,71,75,79,83,87,91,95,99]),
+      jingga: new Set([4,8,12,16,20,24,28,32,36,40,44,48,52,56,60,64,68,72,76,80,84,88,92,96,100])
+    };
 
-const COLOR_INFO = {
-  emas: { label: 'Emas', desc: 'Tegas, amanah, suka kestabilan dan tanggungjawab. Anda menunjukkan ciri-ciri sistematik dan teliti.' },
-  hijau: { label: 'Hijau', desc: 'Intelektual, ingin tahu dan analitikal. Anda gemar meneroka idea dan pembelajaran.' },
-  biru: { label: 'Biru', desc: 'Mesra, penyayang dan menitikberatkan keharmonian. Anda seorang pendengar dan pengasuh.' },
-  jingga: { label: 'Jingga', desc: 'Aktif, suka cabaran dan pengalaman praktikal. Anda suka kerja lasak dan kebebasan.' }
-};
+    const COLOR_INFO = {
+      emas: { label: 'Emas', desc: 'Tegas, amanah, suka kestabilan dan tanggungjawab.' },
+      hijau: { label: 'Hijau', desc: 'Intelektual, ingin tahu dan analitikal.' },
+      biru: { label: 'Biru', desc: 'Mesra, penyayang dan menitikberatkan keharmonian.' },
+      jingga: { label: 'Jingga', desc: 'Aktif, suka cabaran dan pengalaman praktikal.' }
+    };
 
-export default function ColorPersonalityQuiz100() {
-  const [answers, setAnswers] = useState(Array(100).fill(null)); // true = Ya, false = Tidak
-  const [page, setPage] = useState(0); // pagination, 10 items per page
-  const perPage = 10;
+    function App() {
+      const [answers, setAnswers] = useState(Array(100).fill(null));
+      const [page, setPage] = useState(0);
+      const perPage = 10;
+      const totalPages = Math.ceil(QUESTIONS.length / perPage);
 
-  const totalPages = Math.ceil(QUESTIONS.length / perPage);
+      function setAnswer(idx, val) {
+        const copy = [...answers];
+        copy[idx] = val;
+        setAnswers(copy);
+      }
 
-  function setAnswer(idx, val) {
-    const copy = [...answers];
-    copy[idx] = val;
-    setAnswers(copy);
-  }
+      function computeScores() {
+        const counts = { emas: 0, hijau: 0, biru: 0, jingga: 0 };
+        answers.forEach((ans, i) => {
+          if (!ans) return;
+          const qIndex = i + 1;
+          if (COLOR_GROUPS.emas.has(qIndex)) counts.emas++;
+          if (COLOR_GROUPS.hijau.has(qIndex)) counts.hijau++;
+          if (COLOR_GROUPS.biru.has(qIndex)) counts.biru++;
+          if (COLOR_GROUPS.jingga.has(qIndex)) counts.jingga++;
+        });
+        return counts;
+      }
 
-  const isComplete = useMemo(() => answers.every(a => a !== null), [answers]);
+      function getResult() {
+        const c = computeScores();
+        const max = Math.max(c.emas, c.hijau, c.biru, c.jingga);
+        const winners = Object.keys(c).filter(k => c[k] === max && max > 0);
+        return { counts: c, winners, max };
+      }
 
-  function computeScores() {
-    const counts = { emas: 0, hijau: 0, biru: 0, jingga: 0 };
-    answers.forEach((ans, i) => {
-      if (!ans) return; // only count 'Ya'
-      const qIndex = i + 1;
-      if (COLOR_GROUPS.emas.has(qIndex)) counts.emas++;
-      if (COLOR_GROUPS.hijau.has(qIndex)) counts.hijau++;
-      if (COLOR_GROUPS.biru.has(qIndex)) counts.biru++;
-      if (COLOR_GROUPS.jingga.has(qIndex)) counts.jingga++;
-    });
-    return counts;
-  }
+      const result = useMemo(() => getResult(), [answers]);
 
-  function getResult() {
-    const c = computeScores();
-    const max = Math.max(c.emas, c.hijau, c.biru, c.jingga);
-    const winners = Object.keys(c).filter(k => c[k] === max && max > 0);
-    return { counts: c, winners, max };
-  }
+      return React.createElement('div', { className: 'min-h-screen p-6' },
+        React.createElement('h1', { className: 'text-xl font-bold mb-4' }, 'Ujian Personaliti Warna — 100 Soalan'),
+        React.createElement('div', null, `Halaman ${page+1} daripada ${totalPages}`),
+        QUESTIONS.slice(page*perPage, page*perPage+perPage).map((q, idx) => {
+          const globalIdx = page*perPage+idx;
+          const answer = answers[globalIdx];
+          return React.createElement('div', { key: globalIdx, className: 'p-2 border rounded mt-2' },
+            React.createElement('div', null, `Soalan ${globalIdx+1}: ${q}`),
+            React.createElement('button', { onClick:()=>setAnswer(globalIdx,true), className:'mr-2 '+(answer===true?'bg-green-200':'' )}, 'Ya'),
+            React.createElement('button', { onClick:()=>setAnswer(globalIdx,false), className:(answer===false?'bg-red-200':'' )}, 'Tidak')
+          );
+        }),
+        React.createElement('div', { className: 'mt-4' },
+          React.createElement('button', { onClick:()=>setPage(p=>Math.max(0,p-1)), className:'mr-2' }, 'Sebelum'),
+          React.createElement('button', { onClick:()=>setPage(p=>Math.min(totalPages-1,p+1)) }, 'Seterusnya')
+        ),
+        React.createElement('div', { className: 'mt-4 p-4 border rounded' },
+          React.createElement('h2', { className:'font-bold' }, 'Keputusan Sementara'),
+          Object.keys(result.counts).map(k =>
+            React.createElement('div', { key:k }, `${COLOR_INFO[k].label}: ${result.counts[k]}`)
+          ),
+          result.winners.length>0 && React.createElement('div', { className:'mt-2' }, `Warna dominan: ${result.winners.map(k=>COLOR_INFO[k].label).join(', ')}`)
+        )
+      );
+    }
 
-  function reset() {
-    setAnswers(Array(100).fill(null));
-    setPage(0);
-  }
-
-  function downloadResult() {
-    const r = getResult();
-    const lines = [];
-    lines.push('Ujian Personaliti Warna - Keputusan');
-    lines.push('-------------------------------');
-    lines.push(`Tarikh: ${new Date().toLocaleString()}`);
-    lines.push('');
-    lines.push('Kiraan (Ya) mengikut warna:');
-    lines.push(`Emas: ${r.counts.emas}`);
-    lines.push(`Hijau: ${r.counts.hijau}`);
-    lines.push(`Biru: ${r.counts.biru}`);
-    lines.push(`Jingga: ${r.counts.jingga}`);
-    lines.push('');
-    if (r.winners.length === 0) lines.push('Tiada keputusan (tiada "Ya" dijawab).');
-    else lines.push(`Warna dominan: ${r.winners.map(k => COLOR_INFO[k].label).join(', ')}`);
-    lines.push('');
-    lines.push('Nota: Soalan diambil dari inventori rasmi yang dibekalkan. Keputusan bersifat indikatif.');
-
-    const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'keputusan_personaliti_warna.txt';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-  }
-
-  const result = useMemo(() => getResult(), [answers]);
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white p-6 flex items-center justify-center">
-      <div className="max-w-4xl w-full bg-white shadow-2xl rounded-2xl p-6">
-        <header className="flex items-start justify-between">
-          <div>
-            <h1 className="text-2xl font-extrabold">Ujian Personaliti Warna — 100 Soalan</h1>
-            <p className="text-sm text-gray-600">Jawab Ya/Tidak. Kiraan "Ya" bagi kumpulan soalan akan menentukan warna dominan anda.</p>
-          </div>
-          <div className="text-right text-xs text-gray-500">Berdasarkan inventori yang anda berikan.</div>
-        </header>
-
-        <main className="mt-4">
-          <div className="mb-3 text-sm text-gray-700">Halaman {page + 1} daripada {totalPages} — Tunjukkan {perPage} soalan setiap muka</div>
-
-          <div className="grid gap-3">
-            {QUESTIONS.slice(page * perPage, page * perPage + perPage).map((q, idx) => {
-              const globalIdx = page * perPage + idx; // 0-based
-              const answer = answers[globalIdx];
-              return (
-                <div key={globalIdx} className="p-4 border rounded-lg flex items-center justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="text-sm text-gray-700">Soalan {globalIdx + 1}.</div>
-                    <div className="mt-1 font-medium">{q}</div>
-                    <div className="mt-1 text-xs text-gray-500">Kumpulan: {Object.keys(COLOR_GROUPS).find(k => COLOR_GROUPS[k].has(globalIdx + 1)).toUpperCase()}</div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setAnswer(globalIdx, true)}
-                      className={`px-3 py-2 rounded-md border ${answer === true ? 'bg-green-100 border-green-300' : ''}`}
-                    >Ya</button>
-                    <button
-                      onClick={() => setAnswer(globalIdx, false)}
-                      className={`px-3 py-2 rounded-md border ${answer === false ? 'bg-red-100 border-red-300' : ''}`}
-                    >Tidak</button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="mt-4 flex items-center justify-between gap-4">
-            <div className="flex gap-2">
-              <button onClick={() => setPage(p => Math.max(0, p - 1))} className="px-3 py-2 rounded border">Sebelum</button>
-              <button onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))} className="px-3 py-2 rounded border">Seterusnya</button>
-              <button onClick={() => { setAnswers(Array(100).fill(null)); setPage(0); }} className="px-3 py-2 rounded border bg-gray-100">Kosongkan</button>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <div className="text-sm text-gray-600">Soalan dijawab: {answers.filter(a => a !== null).length} / 100</div>
-              <button onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="px-3 py-2 rounded border">Ke Atas</button>
-            </div>
-          </div>
-
-          <section className="mt-6 p-4 rounded-lg bg-gray-50 border">
-            <h2 className="font-bold">Keputusan Sementara</h2>
-            <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
-              {Object.keys(result.counts).map(key => (
-                <div key={key} className="p-3 rounded border text-center">
-                  <div className="text-xs text-gray-500">{COLOR_INFO[key].label}</div>
-                  <div className="mt-1 text-lg font-semibold">{result.counts[key]}</div>
-                  <div className="mt-1 text-xs text-gray-600">{COLOR_INFO[key].desc}</div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-4">
-              {result.winners.length === 0 ? (
-                <div className="text-sm text-gray-600">Belum ada keputusan — sila jawab beberapa soalan (jawab 'Ya' untuk dikira).</div>
-              ) : (
-                <div className="text-sm">
-                  <div>Warna dominan: <strong>{result.winners.map(k => COLOR_INFO[k].label).join(', ')}</strong></div>
-                  <div className="mt-2 text-xs text-gray-500">Jika terdapat lebih dari satu warna dominan, itu menunjukkan kecenderungan campuran.</div>
-                </div>
-              )}
-            </div>
-
-            <div className="mt-4 flex gap-2">
-              <button onClick={downloadResult} className="px-3 py-2 rounded border">Muat Turun Keputusan</button>
-              <button onClick={reset} className="px-3 py-2 rounded border bg-gray-100">Mula Semula</button>
-            </div>
-          </section>
-
-        </main>
-
-        <footer className="mt-6 text-xs text-gray-400 text-center">Nota: Soal selidik ini diambil daripada dokumen inventori yang diberikan oleh pengguna. Keputusan untuk tujuan rujukan sahaja.</footer>
-      </div>
-    </div>
-  );
-}
+    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+  </script>
+</body>
+</html>
