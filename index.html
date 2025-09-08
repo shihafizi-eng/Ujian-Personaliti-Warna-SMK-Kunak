@@ -134,6 +134,9 @@
     function App() {
       const [answers, setAnswers] = useState(Array(100).fill(null));
       const [page, setPage] = useState(0);
+      const [nama, setNama] = useState("");
+      const [kelas, setKelas] = useState("");
+      const [submitted, setSubmitted] = useState(false);
       const perPage = 10;
       const totalPages = Math.ceil(QUESTIONS.length / perPage);
 
@@ -165,28 +168,41 @@
 
       const result = useMemo(() => getResult(), [answers]);
 
-      return React.createElement('div', { className: 'min-h-screen p-6' },
-        React.createElement('h1', { className: 'text-xl font-bold mb-4' }, 'Ujian Personaliti Warna — 100 Soalan'),
+      if (submitted) {
+        return React.createElement('div', { className:'max-w-2xl mx-auto bg-white shadow p-6 mt-6 rounded' },
+          React.createElement('h2', { className:'text-xl font-bold mb-4' }, 'Laporan Keputusan'),
+          React.createElement('p', null, `Nama: ${nama}`),
+          React.createElement('p', null, `Kelas: ${kelas}`),
+          React.createElement('div', { className:'mt-4' },
+            Object.keys(result.counts).map(k =>
+              React.createElement('div', { key:k }, `${COLOR_INFO[k].label}: ${result.counts[k]}`)
+            )
+          ),
+          result.winners.length>0 && React.createElement('div', { className:'mt-2 font-semibold' }, `Warna dominan: ${result.winners.map(k=>COLOR_INFO[k].label).join(', ')}`),
+          React.createElement('button', { onClick:()=>window.print(), className:'mt-4 bg-gray-200 px-4 py-2 rounded' }, 'Cetak Laporan')
+        );
+      }
+
+      return React.createElement('div', { className:'max-w-4xl mx-auto bg-white shadow p-6 mt-6 rounded' },
+        React.createElement('h1', { className:'text-2xl font-bold mb-4' }, 'Ujian Personaliti Warna — 100 Soalan'),
+        React.createElement('div', { className:'mb-4' },
+          React.createElement('input', { type:'text', placeholder:'Nama', value:nama, onChange:e=>setNama(e.target.value), className:'border p-2 mr-2' }),
+          React.createElement('input', { type:'text', placeholder:'Kelas', value:kelas, onChange:e=>setKelas(e.target.value), className:'border p-2 mr-2' }),
+          React.createElement('button', { onClick:()=>{ if(nama && kelas){ setSubmitted(true);} else {alert('Sila isi nama dan kelas.');}}, className:'bg-blue-500 text-white px-4 py-2 rounded' }, 'Submit')
+        ),
         React.createElement('div', null, `Halaman ${page+1} daripada ${totalPages}`),
         QUESTIONS.slice(page*perPage, page*perPage+perPage).map((q, idx) => {
           const globalIdx = page*perPage+idx;
           const answer = answers[globalIdx];
-          return React.createElement('div', { key: globalIdx, className: 'p-2 border rounded mt-2' },
+          return React.createElement('div', { key:globalIdx, className:'p-2 border rounded mt-2' },
             React.createElement('div', null, `Soalan ${globalIdx+1}: ${q}`),
             React.createElement('button', { onClick:()=>setAnswer(globalIdx,true), className:'mr-2 '+(answer===true?'bg-green-200':'' )}, 'Ya'),
             React.createElement('button', { onClick:()=>setAnswer(globalIdx,false), className:(answer===false?'bg-red-200':'' )}, 'Tidak')
           );
         }),
-        React.createElement('div', { className: 'mt-4' },
-          React.createElement('button', { onClick:()=>setPage(p=>Math.max(0,p-1)), className:'mr-2' }, 'Sebelum'),
-          React.createElement('button', { onClick:()=>setPage(p=>Math.min(totalPages-1,p+1)) }, 'Seterusnya')
-        ),
-        React.createElement('div', { className: 'mt-4 p-4 border rounded' },
-          React.createElement('h2', { className:'font-bold' }, 'Keputusan Sementara'),
-          Object.keys(result.counts).map(k =>
-            React.createElement('div', { key:k }, `${COLOR_INFO[k].label}: ${result.counts[k]}`)
-          ),
-          result.winners.length>0 && React.createElement('div', { className:'mt-2' }, `Warna dominan: ${result.winners.map(k=>COLOR_INFO[k].label).join(', ')}`)
+        React.createElement('div', { className:'mt-4' },
+          React.createElement('button', { onClick:()=>setPage(p=>Math.max(0,p-1)), className:'mr-2 px-3 py-1 border rounded' }, 'Sebelum'),
+          React.createElement('button', { onClick:()=>setPage(p=>Math.min(totalPages-1,p+1)), className:'px-3 py-1 border rounded' }, 'Seterusnya')
         )
       );
     }
